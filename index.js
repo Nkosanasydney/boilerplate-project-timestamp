@@ -24,6 +24,46 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// ===============================
+// TIMESTAMP MICROSERVICE (ADDED)
+// ===============================
+app.get("/api/:date?", function (req, res) {
+  let dateParam = req.params.date;
+  let date;
+
+  // If no date is provided
+  if (!dateParam) {
+    date = new Date();
+  }
+
+  // If it's a Unix timestamp (digits only)
+  else if (/^\d+$/.test(dateParam)) {
+    let num = parseInt(dateParam);
+
+    // Convert seconds → milliseconds if needed
+    if (dateParam.length === 10) {
+      num *= 1000;
+    }
+
+    date = new Date(num);
+  }
+
+  // If it's a normal date string
+  else {
+    date = new Date(dateParam);
+  }
+
+  // Invalid date check
+  if (date.toString() === "Invalid Date") {
+    return res.json({ error: "Invalid Date" });
+  }
+
+  // Send response
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
+});
 
 
 // Listen on port set in environment variable or default to 3000
