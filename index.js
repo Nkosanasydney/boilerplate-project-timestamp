@@ -37,16 +37,16 @@ app.get("/api/:date?", function (req, res) {
   }
 
   // If it's a Unix timestamp (digits only)
-  else if (/^\d+$/.test(dateParam)) {
-    let num = parseInt(dateParam);
+else if (/^\d+$/.test(dateParam)) {
+  let num = Number(dateParam);
 
-    // Convert seconds → milliseconds if needed
-    if (dateParam.length === 10) {
-      num *= 1000;
-    }
-
-    date = new Date(num);
+  // if it's seconds (not milliseconds)
+  if (num < 1000000000000) {
+    num *= 1000;
   }
+
+  date = new Date(num);
+}
 
   // If it's a normal date string
   else {
