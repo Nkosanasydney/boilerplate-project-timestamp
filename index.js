@@ -18,53 +18,33 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+const isInvalidDate = (date) => date.toUTCString === "Invalid Date"
 
 // your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
-});
-
-// ===============================
-// TIMESTAMP MICROSERVICE (ADDED)
-// ===============================
-app.get("/api/:date?", function (req, res) {
-  let dateParam = req.params.date;
-  let date;
-
-  // If no date is provided
-  if (!dateParam) {
-    date = new Date();
+app.get("/api/:date", function (req, res) {
+  let date = new Date(req.params.date)
+  if(isInvalidDate(date)){
+    date = new Date(+req.params.date)
   }
 
-  // If it's a Unix timestamp (digits only)
-else if (/^\d+$/.test(dateParam)) {
-  let num = Number(dateParam);
-
-  // if it's seconds (not milliseconds)
-  if (num < 1000000000000) {
-    num *= 1000;
+  if(isInvalidDate(date)){
+   res.json({error: "Invalid Date"})
+   return; 
   }
 
-  date = new Date(num);
-}
 
-  // If it's a normal date string
-  else {
-    date = new Date(dateParam);
-  }
-
-  // Invalid date check
-  if (date.toString() === "Invalid Date") {
-    return res.json({ error: "Invalid Date" });
-  }
-
-  // Send response
   res.json({
     unix: date.getTime(),
     utc: date.toUTCString()
   });
 });
 
+app.get("/api", (req, res) => {
+  res.json({
+    unix: new Date().getTime(),
+    utx: new Date().toUTCString()
+  })
+})
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
